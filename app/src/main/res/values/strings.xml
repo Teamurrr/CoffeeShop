@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Coffee_shop</string>
+    <string name="cofee_house">Cofee \n <font color="#F1953e">H</font>ouse</string>
+    <string name="Start">Начать</string>
+    <string name="cofee_house2">Cofee <font color="#F1953e">H</font>ouse</string>
+    <string name="search_header">Найти</string>
+    <string name="popular">Популярное</string>
+</resources>
