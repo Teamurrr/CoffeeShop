@@ -65,7 +65,20 @@
                 android:paddingVertical="8dp"
                 android:textColor="@color/white"
                 android:textSize="12sp"
-                tools:text="Aizada • customer" />
+                tools:text="Aizada customer" />
+
+            <TextView
+                android:id="@+id/reserveBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/orange_bg"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="10dp"
+                android:text="@string/reserve_table"
+                android:textColor="@color/white"
+                android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/searchEditText"

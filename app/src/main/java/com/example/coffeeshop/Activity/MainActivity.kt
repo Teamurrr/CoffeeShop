@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        binding.roleBadgeTxt.text = "${session.name} • customer"
+        binding.roleBadgeTxt.text = "${session.name} - customer"
 
         setupStaticUi()
         initCategory()
@@ -64,6 +64,9 @@ class MainActivity : AppCompatActivity() {
         binding.cartTab.setOnClickListener { openCart() }
         binding.ordersTab.setOnClickListener {
             startActivity(Intent(this, CustomerOrdersActivity::class.java))
+        }
+        binding.reserveBtn.setOnClickListener {
+            startActivity(Intent(this, ReservationActivity::class.java))
         }
         binding.roleBadgeTxt.setOnClickListener {
             sessionManager.clear()

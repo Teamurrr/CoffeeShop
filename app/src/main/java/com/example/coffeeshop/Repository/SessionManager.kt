@@ -1,9 +1,8 @@
 package com.example.coffeeshop.Repository
 
 import android.content.Context
-import com.example.coffeeshop.Domain.UserRole
+import com.example.coffeeshop.Domain.ReservationContext
 import com.example.coffeeshop.Domain.UserSession
-import java.util.UUID
 
 class SessionManager(context: Context) {
     private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -16,26 +15,49 @@ class SessionManager(context: Context) {
         return UserSession(userId = userId, role = role, name = name, email = email)
     }
 
-    fun saveCustomer(name: String, email: String) {
+    fun saveSession(session: UserSession) {
         prefs.edit()
-            .putString(KEY_USER_ID, "cust-${UUID.randomUUID()}")
-            .putString(KEY_ROLE, UserRole.CUSTOMER)
-            .putString(KEY_NAME, name)
-            .putString(KEY_EMAIL, email)
-            .apply()
-    }
-
-    fun saveStaff(role: String, name: String) {
-        prefs.edit()
-            .putString(KEY_USER_ID, role)
-            .putString(KEY_ROLE, role)
-            .putString(KEY_NAME, name)
-            .putString(KEY_EMAIL, "")
+            .putString(KEY_USER_ID, session.userId)
+            .putString(KEY_ROLE, session.role)
+            .putString(KEY_NAME, session.name)
+            .putString(KEY_EMAIL, session.email)
             .apply()
     }
 
     fun clear() {
         prefs.edit().clear().apply()
+    }
+
+    fun saveReservationContext(context: ReservationContext) {
+        prefs.edit()
+            .putString(KEY_RESERVATION_ID, context.reservationId)
+            .putString(KEY_TABLE_ID, context.tableId)
+            .putInt(KEY_TABLE_NUMBER, context.tableNumber)
+            .putString(KEY_RESERVATION_TIME, context.reservationTime)
+            .apply()
+    }
+
+    fun getReservationContext(): ReservationContext? {
+        val reservationId = prefs.getString(KEY_RESERVATION_ID, null) ?: return null
+        val tableId = prefs.getString(KEY_TABLE_ID, null) ?: return null
+        val tableNumber = prefs.getInt(KEY_TABLE_NUMBER, -1)
+        val reservationTime = prefs.getString(KEY_RESERVATION_TIME, null) ?: return null
+        if (tableNumber <= 0) return null
+        return ReservationContext(
+            reservationId = reservationId,
+            tableId = tableId,
+            tableNumber = tableNumber,
+            reservationTime = reservationTime
+        )
+    }
+
+    fun clearReservationContext() {
+        prefs.edit()
+            .remove(KEY_RESERVATION_ID)
+            .remove(KEY_TABLE_ID)
+            .remove(KEY_TABLE_NUMBER)
+            .remove(KEY_RESERVATION_TIME)
+            .apply()
     }
 
     companion object {
@@ -44,6 +66,10 @@ class SessionManager(context: Context) {
         private const val KEY_ROLE = "role"
         private const val KEY_NAME = "name"
         private const val KEY_EMAIL = "email"
+        private const val KEY_RESERVATION_ID = "reservation_id"
+        private const val KEY_TABLE_ID = "table_id"
+        private const val KEY_TABLE_NUMBER = "table_number"
+        private const val KEY_RESERVATION_TIME = "reservation_time"
 
         const val CASHIER_PIN = "1111"
         const val BARISTA_PIN = "2222"

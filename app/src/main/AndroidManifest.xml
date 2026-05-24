@@ -47,6 +47,12 @@
         <activity
             android:name=".Activity.AdminMenuPreviewActivity"
             android:exported="false" />
+        <activity
+            android:name=".Activity.ReservationActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activity.AdminReportsActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

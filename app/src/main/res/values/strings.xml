@@ -78,4 +78,26 @@
     <string name="no_categories_admin">No categories yet.</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
+    <string name="reserve_table">Reserve table</string>
+    <string name="reservation_hint">Choose a free table and enter the preferred reservation date and time manually.</string>
+    <string name="reservation_hint_new">Green tables are free. Red tables are reserved. Tap a free table to open the booking dialog.</string>
+    <string name="reservation_time_hint">For example: 27 May, 18:30</string>
+    <string name="no_tables_available">No tables are available yet.</string>
+    <string name="open_reports">Open reports and reservations</string>
+    <string name="reports">Reports</string>
+    <string name="reports_hint">This screen summarizes sales from orders and shows reservations created by customers.</string>
+    <string name="sales_summary">Sales summary</string>
+    <string name="table_management">Table management</string>
+    <string name="table_number">Table number</string>
+    <string name="table_qr">QR code or label</string>
+    <string name="save_table">Save table</string>
+    <string name="reservations">Reservations</string>
+    <string name="no_reservations">No reservations yet.</string>
+    <string name="table_status_board">Table status board</string>
+    <string name="cancel_reservation">Cancel reservation</string>
+    <string name="reservation_date">Date</string>
+    <string name="reservation_time">Time</string>
+    <string name="preorder_question">Need to make a preorder?</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
 </resources>

@@ -82,6 +82,15 @@
                 tools:text="3 items in your order" />
 
             <TextView
+                android:id="@+id/reservationContextTxt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/warm_gray"
+                android:visibility="gone"
+                tools:text="Preorder for table 2 at 27 May, 18:30" />
+
+            <TextView
                 android:id="@+id/totalTxt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

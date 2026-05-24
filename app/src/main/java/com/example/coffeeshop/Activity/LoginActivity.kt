@@ -7,11 +7,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.example.coffeeshop.Domain.UserRole
 import com.example.coffeeshop.Repository.SessionManager
+import com.example.coffeeshop.ViewModel.MainViewModel
 import com.example.coffeeshop.databinding.ActivityLoginBinding
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var sessionManager: SessionManager
+    private val viewModel = MainViewModel()
     private var selectedRole: String = UserRole.CUSTOMER
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,33 +68,48 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun submit() {
+        binding.loginBtn.isEnabled = false
         if (selectedRole == UserRole.CUSTOMER) {
             val name = binding.nameEditText.text.toString().trim()
             val email = binding.emailEditText.text.toString().trim()
             if (name.length < 2 || !email.contains("@")) {
+                binding.loginBtn.isEnabled = true
                 Toast.makeText(this, "Enter a valid name and email", Toast.LENGTH_LONG).show()
                 return
             }
-            sessionManager.saveCustomer(name, email)
+            viewModel.signInCustomer(name, email) { result ->
+                runOnUiThread {
+                    binding.loginBtn.isEnabled = true
+                    if (!result.success || result.session == null) {
+                        Toast.makeText(this, result.errorMessage ?: "Unable to sign in", Toast.LENGTH_LONG).show()
+                        return@runOnUiThread
+                    }
+                    sessionManager.saveSession(result.session)
+                    routeByRole()
+                }
+            }
         } else {
             val staffName = binding.staffNameEditText.text.toString().trim().ifBlank {
                 selectedRole.replaceFirstChar { it.titlecase() }
             }
             val pin = binding.pinEditText.text.toString().trim()
-            val isValid = when (selectedRole) {
-                UserRole.CASHIER -> pin == SessionManager.CASHIER_PIN
-                UserRole.BARISTA -> pin == SessionManager.BARISTA_PIN
-                UserRole.ADMIN -> pin == SessionManager.ADMIN_PIN
-                else -> false
-            }
-            if (!isValid) {
-                Toast.makeText(this, "Wrong demo PIN for selected role", Toast.LENGTH_LONG).show()
+            if (pin.isBlank()) {
+                binding.loginBtn.isEnabled = true
+                Toast.makeText(this, "Enter PIN for selected role", Toast.LENGTH_LONG).show()
                 return
             }
-            sessionManager.saveStaff(selectedRole, staffName)
+            viewModel.signInStaff(selectedRole, pin, staffName) { result ->
+                runOnUiThread {
+                    binding.loginBtn.isEnabled = true
+                    if (!result.success || result.session == null) {
+                        Toast.makeText(this, result.errorMessage ?: "Unable to sign in", Toast.LENGTH_LONG).show()
+                        return@runOnUiThread
+                    }
+                    sessionManager.saveSession(result.session)
+                    routeByRole()
+                }
+            }
         }
-
-        routeByRole()
     }
 
     private fun routeByRole() {

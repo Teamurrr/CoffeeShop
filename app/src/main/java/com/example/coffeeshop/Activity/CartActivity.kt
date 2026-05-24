@@ -36,6 +36,7 @@ class CartActivity : AppCompatActivity() {
         setupRecycler()
         setupActions()
         observeCart()
+        renderReservationContext()
     }
 
     private fun setupRecycler() {
@@ -58,16 +59,19 @@ class CartActivity : AppCompatActivity() {
             binding.checkoutBtn.isEnabled = false
             val paymentMethod = if (binding.qrRadioBtn.isChecked) PaymentMethod.QR else PaymentMethod.CARD
             val session = sessionManager.getSession() ?: return@setOnClickListener
+            val reservationContext = sessionManager.getReservationContext()
             viewModel.createOrder(
                 currentItems,
                 binding.noteEditText.text.toString(),
                 paymentMethod,
-                session
+                session,
+                reservationContext
             ) { result ->
                 runOnUiThread {
                     binding.checkoutBtn.isEnabled = true
                     if (result.success) {
                         CartManager.clear()
+                        sessionManager.clearReservationContext()
                         Toast.makeText(
                             this,
                             getString(com.example.coffeeshop.R.string.order_created, result.orderId ?: ""),
@@ -96,6 +100,17 @@ class CartActivity : AppCompatActivity() {
             )
             binding.totalTxt.text = "$%.2f".format(CartManager.totalPrice())
             binding.checkoutBtn.isEnabled = items.isNotEmpty()
+        }
+    }
+
+    private fun renderReservationContext() {
+        val reservation = sessionManager.getReservationContext()
+        if (reservation == null) {
+            binding.reservationContextTxt.visibility = android.view.View.GONE
+        } else {
+            binding.reservationContextTxt.visibility = android.view.View.VISIBLE
+            binding.reservationContextTxt.text =
+                "Preorder for table ${reservation.tableNumber} at ${reservation.reservationTime}"
         }
     }
 }
