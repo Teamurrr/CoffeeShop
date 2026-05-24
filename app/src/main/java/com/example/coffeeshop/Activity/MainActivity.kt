@@ -13,13 +13,16 @@ import com.example.coffeeshop.Adapter.PopularAdapter
 import com.example.coffeeshop.Adapter.SpecialAdapter
 import com.example.coffeeshop.Domain.CategoryModel
 import com.example.coffeeshop.Domain.ItemModel
+import com.example.coffeeshop.Domain.UserRole
 import com.example.coffeeshop.Repository.CartManager
+import com.example.coffeeshop.Repository.SessionManager
 import com.example.coffeeshop.ViewModel.MainViewModel
 import com.example.coffeeshop.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val viewModel = MainViewModel()
+    private lateinit var sessionManager: SessionManager
 
     private var allItems: List<ItemModel> = emptyList()
     private var selectedCategory: CategoryModel? = null
@@ -32,6 +35,16 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        sessionManager = SessionManager(this)
+        val session = sessionManager.getSession()
+        if (session == null || session.role != UserRole.CUSTOMER) {
+            startActivity(Intent(this, LoginActivity::class.java))
+            finishAffinity()
+            return
+        }
+
+        binding.roleBadgeTxt.text = "${session.name} • customer"
 
         setupStaticUi()
         initCategory()
@@ -50,7 +63,12 @@ class MainActivity : AppCompatActivity() {
         binding.cartSummaryBtn.setOnClickListener { openCart() }
         binding.cartTab.setOnClickListener { openCart() }
         binding.ordersTab.setOnClickListener {
-            startActivity(Intent(this, OrdersActivity::class.java))
+            startActivity(Intent(this, CustomerOrdersActivity::class.java))
+        }
+        binding.roleBadgeTxt.setOnClickListener {
+            sessionManager.clear()
+            startActivity(Intent(this, LoginActivity::class.java))
+            finishAffinity()
         }
     }
 

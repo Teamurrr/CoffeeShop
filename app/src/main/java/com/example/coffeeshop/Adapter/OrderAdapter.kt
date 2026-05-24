@@ -33,7 +33,7 @@ class OrderAdapter(
         holder.binding.totalTxt.text = "$%.2f".format(order.totalAmount)
         holder.binding.itemsTxt.text = "${order.items.sumOf { it.quantity }} items"
         holder.binding.timeTxt.text = formatter.format(Date(order.createdAt))
-        holder.binding.noteTxt.text = order.customerNote.ifBlank { "No customer note" }
+        holder.binding.noteTxt.text = buildNote(order)
 
         when (mode) {
             MODE_CASHIER -> {
@@ -46,6 +46,11 @@ class OrderAdapter(
                 holder.binding.primaryActionBtn.text =
                     if (order.status == OrderStatus.PAID) "Mark completed" else "Waiting for payment"
                 holder.binding.primaryActionBtn.isEnabled = order.status == OrderStatus.PAID
+            }
+
+            MODE_CUSTOMER -> {
+                holder.binding.primaryActionBtn.text = "Status tracked automatically"
+                holder.binding.primaryActionBtn.isEnabled = false
             }
 
             else -> {
@@ -66,8 +71,15 @@ class OrderAdapter(
         notifyDataSetChanged()
     }
 
+    private fun buildNote(order: OrderModel): String {
+        val customerLine = if (mode == MODE_CUSTOMER) "" else "${order.customerName} ${order.customerEmail}".trim()
+        val noteLine = order.customerNote.ifBlank { "No customer note" }
+        return listOf(customerLine, noteLine).filter { it.isNotBlank() }.joinToString("\n")
+    }
+
     companion object {
         const val MODE_CASHIER = "cashier"
         const val MODE_BARISTA = "barista"
+        const val MODE_CUSTOMER = "customer"
     }
 }

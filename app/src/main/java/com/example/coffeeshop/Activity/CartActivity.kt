@@ -7,7 +7,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.coffeeshop.Adapter.CartAdapter
 import com.example.coffeeshop.Domain.PaymentMethod
+import com.example.coffeeshop.Domain.UserRole
 import com.example.coffeeshop.Repository.CartManager
+import com.example.coffeeshop.Repository.SessionManager
 import com.example.coffeeshop.ViewModel.MainViewModel
 import com.example.coffeeshop.databinding.ActivityCartBinding
 
@@ -15,12 +17,21 @@ class CartActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCartBinding
     private val viewModel = MainViewModel()
     private lateinit var cartAdapter: CartAdapter
+    private lateinit var sessionManager: SessionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         binding = ActivityCartBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        sessionManager = SessionManager(this)
+        val session = sessionManager.getSession()
+        if (session == null || session.role != UserRole.CUSTOMER) {
+            startActivity(android.content.Intent(this, LoginActivity::class.java))
+            finishAffinity()
+            return
+        }
 
         setupRecycler()
         setupActions()
@@ -46,10 +57,12 @@ class CartActivity : AppCompatActivity() {
 
             binding.checkoutBtn.isEnabled = false
             val paymentMethod = if (binding.qrRadioBtn.isChecked) PaymentMethod.QR else PaymentMethod.CARD
+            val session = sessionManager.getSession() ?: return@setOnClickListener
             viewModel.createOrder(
                 currentItems,
                 binding.noteEditText.text.toString(),
-                paymentMethod
+                paymentMethod,
+                session
             ) { result ->
                 runOnUiThread {
                     binding.checkoutBtn.isEnabled = true

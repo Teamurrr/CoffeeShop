@@ -3,12 +3,14 @@ package com.example.coffeeshop.Repository
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.coffeeshop.Domain.CategoryModel
+import com.example.coffeeshop.Domain.DataActionResult
 import com.example.coffeeshop.Domain.ItemModel
 import com.example.coffeeshop.Domain.OrderItemModel
 import com.example.coffeeshop.Domain.OrderModel
 import com.example.coffeeshop.Domain.OrderResult
 import com.example.coffeeshop.Domain.OrderStatus
 import com.example.coffeeshop.Domain.PaymentStatus
+import com.example.coffeeshop.Domain.UserSession
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -101,6 +103,7 @@ class MainRepository {
         items: List<ItemModel>,
         customerNote: String,
         paymentMethod: String,
+        session: UserSession,
         onComplete: (OrderResult) -> Unit
     ) {
         val ordersRef = firebaseDatabase.getReference("Orders")
@@ -124,6 +127,9 @@ class MainRepository {
 
         val order = OrderModel(
             id = orderId,
+            customerId = session.userId,
+            customerName = session.name,
+            customerEmail = session.email,
             status = OrderStatus.PENDING,
             paymentMethod = paymentMethod,
             paymentStatus = PaymentStatus.PENDING,
@@ -164,6 +170,27 @@ class MainRepository {
                 listData.value = mutableListOf()
             }
         })
+        return listData
+    }
+
+    fun loadOrdersForCustomer(customerId: String): LiveData<MutableList<OrderModel>> {
+        val listData = MutableLiveData<MutableList<OrderModel>>()
+        val ref = firebaseDatabase.getReference("Orders")
+        ref.orderByChild("customerId").equalTo(customerId)
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val list = mutableListOf<OrderModel>()
+                    for (child in snapshot.children) {
+                        val item = child.getValue(OrderModel::class.java)
+                        item?.let { list.add(it) }
+                    }
+                    listData.value = list.sortedByDescending { it.createdAt }.toMutableList()
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    listData.value = mutableListOf()
+                }
+            })
         return listData
     }
 
@@ -208,6 +235,79 @@ class MainRepository {
                     error.message ?: "Unknown Firebase error"
                 }
                 onComplete(OrderResult(success = false, errorMessage = message))
+            }
+    }
+
+    fun saveItem(
+        item: ItemModel,
+        onComplete: (DataActionResult) -> Unit
+    ) {
+        val itemsRef = firebaseDatabase.getReference("Items")
+        val itemRef = if (item.id.isBlank()) itemsRef.push() else itemsRef.child(item.id)
+        val itemId = itemRef.key
+
+        if (itemId.isNullOrBlank()) {
+            onComplete(DataActionResult(success = false, errorMessage = "Unable to create item"))
+            return
+        }
+
+        val payload = item.copy(
+            id = itemId,
+            picUrl = ArrayList(item.picUrl.filter { it.isNotBlank() })
+        )
+
+        itemRef.setValue(payload)
+            .addOnSuccessListener {
+                onComplete(DataActionResult(success = true, id = itemId))
+            }
+            .addOnFailureListener { error ->
+                onComplete(DataActionResult(success = false, errorMessage = error.message ?: "Unable to save item"))
+            }
+    }
+
+    fun deleteItem(
+        itemId: String,
+        onComplete: (DataActionResult) -> Unit
+    ) {
+        firebaseDatabase.getReference("Items")
+            .child(itemId)
+            .removeValue()
+            .addOnSuccessListener {
+                onComplete(DataActionResult(success = true, id = itemId))
+            }
+            .addOnFailureListener { error ->
+                onComplete(DataActionResult(success = false, errorMessage = error.message ?: "Unable to delete item"))
+            }
+    }
+
+    fun saveCategory(
+        category: CategoryModel,
+        onComplete: (DataActionResult) -> Unit
+    ) {
+        val categoryId = category.id.toString()
+        firebaseDatabase.getReference("Category")
+            .child(categoryId)
+            .setValue(category)
+            .addOnSuccessListener {
+                onComplete(DataActionResult(success = true, id = categoryId))
+            }
+            .addOnFailureListener { error ->
+                onComplete(DataActionResult(success = false, errorMessage = error.message ?: "Unable to save category"))
+            }
+    }
+
+    fun deleteCategory(
+        categoryId: Int,
+        onComplete: (DataActionResult) -> Unit
+    ) {
+        firebaseDatabase.getReference("Category")
+            .child(categoryId.toString())
+            .removeValue()
+            .addOnSuccessListener {
+                onComplete(DataActionResult(success = true, id = categoryId.toString()))
+            }
+            .addOnFailureListener { error ->
+                onComplete(DataActionResult(success = false, errorMessage = error.message ?: "Unable to delete category"))
             }
     }
 

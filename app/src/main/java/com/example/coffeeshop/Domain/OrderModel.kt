@@ -2,6 +2,9 @@ package com.example.coffeeshop.Domain
 
 data class OrderModel(
     var id: String = "",
+    var customerId: String = "",
+    var customerName: String = "",
+    var customerEmail: String = "",
     var status: String = "",
     var paymentMethod: String = "",
     var paymentStatus: String = "",

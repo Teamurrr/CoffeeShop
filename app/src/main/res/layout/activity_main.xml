@@ -54,6 +54,19 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/roleBadgeTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/brown_bg"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="8dp"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="Aizada • customer" />
+
             <EditText
                 android:id="@+id/searchEditText"
                 android:layout_width="match_parent"
