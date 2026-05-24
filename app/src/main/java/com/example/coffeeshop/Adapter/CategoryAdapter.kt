@@ -3,15 +3,16 @@ package com.example.coffeeshop.Adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewbinding.ViewBinding
 import com.example.coffeeshop.Domain.CategoryModel
 import com.example.coffeeshop.databinding.ViewholderCategoryBinding
 import android.content.Context
 import com.example.coffeeshop.R
 
 
-class CategoryAdapter(val items: MutableList<CategoryModel>):
-RecyclerView.Adapter<CategoryAdapter.Viewholder>() {
+class CategoryAdapter(
+    private val items: MutableList<CategoryModel>,
+    private val onCategorySelected: (CategoryModel?) -> Unit
+) : RecyclerView.Adapter<CategoryAdapter.Viewholder>() {
 
     private lateinit var context: Context
     private var selectedPosition = -1
@@ -36,10 +37,21 @@ RecyclerView.Adapter<CategoryAdapter.Viewholder>() {
         holder.binding.titleCat.text = item.title
 
         holder.binding.root.setOnClickListener  {
+            if (selectedPosition == position) {
+                lastSelectedPosition = selectedPosition
+                selectedPosition = -1
+                notifyItemChanged(lastSelectedPosition)
+                onCategorySelected(null)
+                return@setOnClickListener
+            }
+
             lastSelectedPosition =  selectedPosition
             selectedPosition = position
-            notifyItemChanged(lastSelectedPosition)
+            if (lastSelectedPosition >= 0) {
+                notifyItemChanged(lastSelectedPosition)
+            }
             notifyItemChanged(selectedPosition)
+            onCategorySelected(item)
         }
 
         if(selectedPosition==position){

@@ -7,7 +7,10 @@ import com.bumptech.glide.Glide
 import com.example.coffeeshop.Domain.ItemModel
 import com.example.coffeeshop.databinding.ViewholderSpecialBinding
 
-class SpecialAdapter(val items: MutableList<ItemModel>)
+class SpecialAdapter(
+    private val items: MutableList<ItemModel>,
+    private val onItemClicked: (ItemModel) -> Unit
+)
     : RecyclerView.Adapter<SpecialAdapter.Viewholder>() {
     class Viewholder(val binding: ViewholderSpecialBinding):
         RecyclerView.ViewHolder(binding.root)
@@ -25,13 +28,20 @@ class SpecialAdapter(val items: MutableList<ItemModel>)
     }
 
     override fun onBindViewHolder(holder: SpecialAdapter.Viewholder, position: Int) {
-        holder.binding.titleTxt.text=items[position].title
-        holder.binding.priceTxt.text="$"+items[position].price.toString()
-        holder.binding.ratingBar.rating=items[position].rating.toFloat()
+        val item = items[position]
+        holder.binding.titleTxt.text=item.title
+        holder.binding.priceTxt.text="$%.2f".format(item.price)
+        holder.binding.ratingBar.rating=item.rating.toFloat()
 
         Glide.with(holder.itemView.context)
-            .load(items[position].picUrl[0])
+            .load(item.firstImageUrl())
+            .placeholder(com.example.coffeeshop.R.drawable.coffee)
+            .error(com.example.coffeeshop.R.drawable.coffee)
             .into(holder.binding.picMain)
+
+        holder.binding.root.setOnClickListener {
+            onItemClicked(item)
+        }
     }
 
     override fun getItemCount(): Int = items.size

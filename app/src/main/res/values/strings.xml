@@ -1,8 +1,45 @@
 <resources>
     <string name="app_name">Coffee_shop</string>
-    <string name="cofee_house">Cofee \n <font color="#F1953e">H</font>ouse</string>
-    <string name="Start">Начать</string>
-    <string name="cofee_house2">Cofee <font color="#F1953e">H</font>ouse</string>
-    <string name="search_header">Найти</string>
-    <string name="popular">Популярное</string>
+    <string name="cofee_house">Coffee \n <font color="#F1953e">H</font>ouse</string>
+    <string name="Start">Start</string>
+    <string name="cofee_house2">Coffee <font color="#F1953e">H</font>ouse</string>
+    <string name="search_header">Search drinks</string>
+    <string name="popular">Popular now</string>
+    <string name="categories">Categories</string>
+    <string name="tap_for_details">Tap a card to open details</string>
+    <string name="all_menu">Full menu</string>
+    <string name="special_for_you">Special for you</string>
+    <string name="ready_to_order">Ready to order</string>
+    <string name="no_items_found">No drinks match this search.</string>
+    <string name="explorer">Explore</string>
+    <string name="cart">Cart</string>
+    <string name="my_order">My order</string>
+    <string name="cart_empty">Cart: 0</string>
+    <string name="add_to_cart">Add to cart</string>
+    <string name="back">Back</string>
+    <string name="about_drink">About this drink</string>
+    <string name="ingredients">Ingredients</string>
+    <string name="quantity">Quantity</string>
+    <string name="decrease">Decrease quantity</string>
+    <string name="increase">Increase quantity</string>
+    <string name="cart_is_empty">Your cart is empty for now.</string>
+    <string name="order_note_hint">Add a short note for your order</string>
+    <string name="place_order">Place order</string>
+    <string name="items_in_order">%1$d items in your order</string>
+    <string name="cart_summary">%1$d items</string>
+    <string name="order_added">Added to cart</string>
+    <string name="order_created">Order created: %1$s</string>
+    <string name="order_failed">Unable to create order</string>
+    <string name="open_cart">Open cart</string>
+    <string name="firebase_rules_orders_hint">Firebase rules block write access to Orders</string>
+    <string name="payment_method">Payment method</string>
+    <string name="card">Card</string>
+    <string name="qr_code">QR code</string>
+    <string name="payment_mock_hint">Sprint 2 uses a mock secure payment choice. Cashier confirms the payment on the staff board.</string>
+    <string name="order_board">Order board</string>
+    <string name="cashier">Cashier</string>
+    <string name="barista">Barista</string>
+    <string name="cashier_hint">Cashier confirms new pending orders after the selected payment method.</string>
+    <string name="barista_hint">Barista sees only paid orders and marks them as completed.</string>
+    <string name="no_orders_for_role">No orders in this queue yet.</string>
 </resources>

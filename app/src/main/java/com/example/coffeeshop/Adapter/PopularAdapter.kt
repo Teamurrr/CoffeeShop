@@ -9,7 +9,10 @@ import com.bumptech.glide.Glide
 import com.example.coffeeshop.Domain.ItemModel
 import com.example.coffeeshop.databinding.ViewholderPopularBinding
 
-class PopularAdapter(val items: MutableList<ItemModel>):
+class PopularAdapter(
+    private val items: MutableList<ItemModel>,
+    private val onItemClicked: (ItemModel) -> Unit
+):
     RecyclerView.Adapter<PopularAdapter.Viewholder>(){
 
         lateinit var context: Context
@@ -28,13 +31,23 @@ class PopularAdapter(val items: MutableList<ItemModel>):
     }
 
     override fun onBindViewHolder(holder: PopularAdapter.Viewholder, position: Int) {
-        holder.binding.titleTxt.text=items[position].title
-        holder.binding.extraTxt.text=items[position].extra
-        holder.binding.priceTxt.text="$"+items[position].price.toString()
+        val item = items[position]
+        holder.binding.titleTxt.text=item.title
+        holder.binding.extraTxt.text=item.extra
+        holder.binding.priceTxt.text="$%.2f".format(item.price)
 
         Glide.with(context)
-            .load(items[position].picUrl[0])
+            .load(item.firstImageUrl())
+            .placeholder(com.example.coffeeshop.R.drawable.coffee)
+            .error(com.example.coffeeshop.R.drawable.coffee)
             .into(holder.binding.pic)
+
+        holder.binding.root.setOnClickListener {
+            onItemClicked(item)
+        }
+        holder.binding.imageView3.setOnClickListener {
+            onItemClicked(item)
+        }
     }
 
     override fun getItemCount(): Int = items.size

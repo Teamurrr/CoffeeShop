@@ -1,0 +1,745 @@
+
+              TECHNICAL SPECIFICATION
+Development of a Mobile Application for a Coffee Shop "Athena"
+1. Introduction
+This technical specification describes the development of a mobile information system for the coffee shop "Athena". The system is intended to automate customer service processes including digital menu access, order placement, payment processing via card or QR code, and table reservation management.
+The restaurant and café industry is actively undergoing digital transformation. Modern customers expect fast, convenient, and contactless service. Traditional service models, which rely on manual billing, paper menus, and phone-based reservations, lead to delays, human errors, and increased staff workload.
+The development of the AIS "Athena" mobile application directly addresses these problems and provides a competitive advantage in a technology-driven market.
+1.1 Analysis of Existing Analogues
+Before development, a comparative analysis of existing solutions in the market was conducted:
+
+System
+Advantages
+Disadvantages
+iiko (mobile module)
+Full POS integration, loyalty system, analytics
+High cost, complex setup, requires iiko backend
+Poster POS
+Cloud-based, easy interface, QR menu support
+Limited customization, subscription-based
+Yandex Eats / Delivery Club
+Large audience, payment integration
+Commission fees, no in-café table management
+Custom café apps (e.g. Cofix)
+Branded experience, loyalty program
+High development cost, complex maintenance
+AIS Athena (proposed)
+Custom for café needs, QR billing, Firebase, no commission
+New product, requires initial development
+
+Based on the analysis, existing solutions either require expensive subscriptions and integrations, or lack the specific features needed (table-based QR billing, in-house order routing to baristas). The proposed system fills this gap with a tailored, cost-effective solution.
+
+2. General Information
+Parameter
+Value
+Full system name
+Automated Information System "Athena Coffee Shop Mobile Application"
+Short name
+AIS "Athena"
+Customer
+Athena Coffee Shop
+Developer
+Student project, SE(engl)-1-23
+Basis for development
+Laboratory Work №8, BSRA course requirements
+Academic supervisor
+Valeeva
+Development year
+2025
+
+3. Purpose and Goals of System Development
+3.1 Functional Purpose
+The system is intended for automation of customer service processes in the coffee shop "Athena": digital menu access, order placement and tracking, payment processing (card / QR code), table reservation, and automated sales reporting.
+3.2 Operational Purpose
+The application will allow customers to:
+view the digital menu with categories, descriptions, and prices;
+add items to the cart and place orders;
+make payments via card or QR code;
+reserve tables for a selected date and time.
+
+The system will allow employees and administrators to:
+cashier — process and confirm customer payments;
+barista — view assigned orders and mark them as completed;
+administrator — manage menu items and view sales reports.
+3.3 Goals of Development
+Goal
+Target KPI
+Timeframe
+Increase average bill
++15% (from 350 to ~402 KGS)
+6 months after launch
+Reduce calculation errors
+-70% (from 8–10 to 2–3 per week)
+From day 1
+Reduce report generation time
+-50% (from 35–40 to 15–20 min per shift)
+From day 1
+Increase repeat purchases
++20% (from 35% to 42%)
+6 months after launch
+
+4. Characteristics of the Object of Automation
+The object of automation is the customer service process in the coffee shop "Athena".
+Current state (AS-IS): The café operates with manual order recording via basic POS, manual calculation of totals, manual end-of-shift reconciliation, and report preparation in Excel. This leads to ~8–10 calculation errors per week and 35–40 minutes spent on report generation per shift.
+The system automates the following business processes:
+customer ordering (digital menu → cart → order confirmation);
+payment processing (card / QR code via secure external API);
+order routing to barista upon payment confirmation;
+menu management by administrator;
+automatic report generation at end of shift.
+
+4.1 Main Actors
+Actor
+Description
+Role in System
+Customer
+Visitor of the coffee shop
+Views menu, places orders, makes payments, reserves tables
+Cashier
+Coffee shop employee
+Processes and confirms payments
+Barista
+Coffee shop employee
+Views assigned orders, marks orders as completed
+Administrator
+System manager
+Manages menu items, views reports
+
+4.2 Environment of Operation
+The system operates as a mobile Android application (Kotlin, Android Studio). Backend: Firebase Realtime Database / Firestore. External integrations: Stripe, Google Pay payment APIs (HTTPS encrypted).
+
+5. Requirements for the Automated System
+5.1 Business Requirements (BR)
+ID
+Business Requirement
+Verifiable
+BR-01
+Increase the average bill by 15% within 6 months (baseline: 350 KGS)
+Yes
+BR-02
+Reduce report generation time by 50% (baseline: 35–40 min/shift)
+Yes
+BR-03
+Reduce calculation errors by 70% (baseline: 8–10 cases/week)
+Yes
+BR-04
+Increase repeat purchases by 20% (baseline: 35%)
+Yes
+
+5.2 User Requirements (UR)
+ID
+User Requirement
+Actor
+Priority
+UR-01
+View menu
+Customer
+Must
+UR-02
+Place order
+Customer
+Must
+UR-03
+Process payment (card / QR code)
+Customer / Cashier
+Must
+UR-04
+Prepare order
+Barista
+Must
+UR-05
+Manage menu
+Administrator
+Should
+UR-06
+Book table
+Customer
+Could
+
+5.3 Business Processes (BP)
+BP-01: Customer Order Process (TO-BE)
+1. Customer opens the application and browses the digital menu.
+2. Customer selects items and adds them to the cart.
+3. Customer confirms the order.
+4. The system creates the order and sends it to the cashier.
+5. Cashier processes the payment (card / QR).
+6. The system confirms payment and routes the order to the barista.
+7. Barista prepares the order and marks it as completed.
+8. Customer receives the order.
+
+BP-02: Menu Management Process (TO-BE)
+1. Administrator logs into the system.
+2. Administrator opens the menu management section.
+3. Administrator adds, edits, or deletes menu items (price, description, category, images).
+4. The system saves changes immediately to the database.
+5. Updated menu is visible to customers in real time.
+
+BP-03: Report Generation Process (TO-BE)
+1. At the end of the shift, the administrator opens the reports section.
+2. The system automatically generates the daily sales report.
+3. The report includes: total revenue, number of transactions, average bill, breakdown by categories.
+4. The administrator reviews and exports the report.
+
+5.4 Functional Requirements (FR)
+FR ID
+Functional Requirement
+Priority
+Stakeholder
+FR-001
+The system shall display menu items when the customer opens the application
+Must
+Customer
+FR-002
+The system shall allow customers to add items to the cart
+Must
+Customer
+FR-003
+The system shall create an order after customer confirmation
+Must
+Customer
+FR-004
+The system shall process payments via card or QR code using secure external APIs
+Must
+Customer / Cashier
+FR-005
+The system shall send paid orders to the barista automatically
+Must
+Barista
+FR-006
+The system shall allow the barista to view and complete assigned orders
+Must
+Barista
+FR-007
+The system shall allow the administrator to add, edit, and delete menu items
+Should
+Admin
+FR-008
+The system shall automatically generate sales reports at end of shift
+Should
+Owner / Admin
+FR-009
+The system shall allow customers to reserve tables for a selected date and time
+Could
+Customer
+
+
+5.5 Non-Functional Requirements (NFR)
+NFR ID
+Requirement
+Category
+Priority
+NFR-01
+Menu must load within 3 seconds under normal load (up to 100 users)
+Performance
+Must
+NFR-02
+Order must be processed within 4 seconds after confirmation
+Performance
+Must
+NFR-03
+System must ensure at least 99.5% uptime per month
+Reliability
+Must
+NFR-04
+Payment processing must use trusted external APIs with HTTPS encryption (Stripe, Google Pay)
+Security
+Must
+NFR-05
+Customer must complete ordering in ≤3 actions and ≤60 seconds; 90% of users on first attempt
+Usability
+Must
+NFR-06
+System must support at least 150 concurrent users without degradation
+Scalability
+Should
+NFR-07
+System updates must require no more than 10 minutes of downtime
+Maintainability
+Should
+NFR-08
+System must be developed for Android 8.0+ with option to extend to iOS
+Portability
+Could
+NFR-09
+Administrator must be able to perform menu operations within 5 seconds per action
+Performance
+Could
+
+5.6 Business Rules
+Each order must be automatically assigned to a barista upon payment confirmation.
+Menu items must have a valid price greater than zero.
+Each payment must be linked to an existing order.
+Only the administrator can add, edit, or delete menu items.
+Reservations must be linked to an existing table.
+Duplicate customer email addresses are not permitted.
+
+6. Data Requirements
+6.1 Data Entities and Attributes
+Entity
+Attribute
+Type
+Constraints
+Customer
+id
+Integer
+PK, auto-increment
+
+name
+String
+Not empty, 3–50 chars
+
+email
+String
+Unique, email format
+
+password
+String
+Min 8 chars, hashed (SHA-256)
+
+phone
+String
+Optional
+MenuItem
+id
+Integer
+PK, auto-increment
+
+name
+String
+Not empty, max 255 chars
+
+price
+Decimal
+> 0, 2 decimal places
+
+category
+String
+Required
+
+description
+String
+Optional
+Order
+id
+Integer
+PK, auto-increment
+
+customer_id
+Integer
+FK → Customer
+
+total_amount
+Decimal
+>= 0
+
+status
+String
+Pending / Paid / Completed
+
+table_id
+Integer
+FK → Table
+Payment
+id
+Integer
+PK, auto-increment
+
+order_id
+Integer
+FK → Order
+
+method
+String
+Card / QR
+
+status
+String
+Success / Failed / Pending
+Table
+id
+Integer
+PK, auto-increment
+
+number
+Integer
+Unique
+
+qr_code
+String
+Unique identifier
+
+status
+String
+Free / Occupied / Reserved
+Reservation
+id
+Integer
+PK, auto-increment
+
+customer_id
+Integer
+FK → Customer
+
+table_id
+Integer
+FK → Table
+
+reservation_time
+DateTime
+Valid future date
+
+6.2 Data Volume
+Up to 1,000 registered customers.
+Up to 1,000 orders stored and processed.
+Up to 500 menu items across all categories.
+Order data stored for at least 3 years for analytics.
+User activity logs stored for at least 1 year.
+
+6.3 Data Integrity
+Email addresses must be unique across all customer records.
+Menu item prices must be greater than zero.
+Each order must reference an existing customer (FK constraint).
+Each payment must reference a valid order (FK constraint).
+Each reservation must reference an existing table (FK constraint).
+
+6.4 Data Security
+Passwords stored using secure hashing (SHA-256 or higher).
+Payment processing via HTTPS with encrypted communication protocols.
+Access to administrative functions restricted to authorized users.
+Personal user data protected from unauthorized access.
+
+7. System Requirements
+7.1 Hardware Requirements
+Component
+Minimum
+Recommended
+Processor
+Dual-core 2.0 GHz
+Quad-core 2.5 GHz or higher
+RAM
+4 GB
+8 GB or more
+Storage
+20 GB HDD/SSD
+50 GB SSD
+Screen Resolution
+1280×720
+1920×1080 or higher
+Network
+10 Mbps
+50 Mbps or faster
+
+7.2 Software Requirements
+Component
+Requirement
+Operating System
+Android 8.0 or higher
+IDE
+Android Studio
+Programming Language
+Kotlin
+Database
+Firebase Realtime Database / Firestore
+Payment APIs
+Stripe, Google Pay (HTTPS)
+Min Android version (user device)
+Android 7 (API 24)
+Recommended Android version
+Android 13+ (API 33)
+
+8. Development Procedure of the Automated System
+8.1 Development Stages and Timeline
+Stage
+Description
+Duration
+Deliverable
+1
+Requirements analysis
+1 week
+Requirements document (Labs 1–7)
+2
+System and database design
+1 week
+Data model, Use Case diagram
+3
+UI/UX prototyping
+1 week
+Wireframes and mockups
+4
+Frontend development (Android / Kotlin)
+2 weeks
+Working UI screens
+5
+Backend and Firebase integration
+1 week
+Connected database
+6
+Payment API integration (Stripe / Google Pay)
+1 week
+Secure payment flow
+7
+Testing (unit, integration, UAT)
+1 week
+Test report
+8
+Deployment and documentation
+1 week
+Deployed app + Technical Specification
+
+8.2 Acceptance Criteria
+All FR-001 – FR-009 are implemented and verified.
+All Must NFRs (NFR-01 – NFR-05) are met and measurable.
+The system passes UAT with at least 90% of test cases successful.
+Technical documentation (Technical Specification) is approved.
+
+9. Glossary
+
+Term
+Definition
+Actor
+A user or external entity that interacts with the system. In this project: Customer, Cashier, Barista, Administrator.
+Administrator
+A system user who manages menu items, monitors operations, and views generated sales reports.
+AS-IS
+The existing state of a business process before any improvements or automation are applied.
+Atomicity
+The property of a requirement ensuring it describes exactly one function and cannot be divided into smaller independent parts.
+Attribute
+A property or characteristic of a data entity stored in the database (e.g., name, price, email).
+Automated Information System (AIS)
+A software system designed to automate business processes and manage data. In this project: the Athena mobile application.
+Barista
+A coffee shop employee who prepares drinks and food items according to orders received through the system.
+Baseline
+An approved and fixed version of a requirement or specification used as a reference for measuring future changes.
+Business Process (BP)
+A structured sequence of activities performed by actors to achieve a specific business outcome (e.g., order processing, report generation).
+Business Requirement (BR)
+A high-level statement of the organization goals or needs that defines what problem the system must solve. Example: increase the average bill by 15%.
+Business Rule
+A constraint or policy governing system behavior. Example: only an administrator can modify the menu.
+Cashier
+A coffee shop employee responsible for confirming and processing customer payments within the system.
+Clarity
+The degree to which a requirement is clearly and unambiguously stated, leaving no room for different interpretations.
+Completeness
+The extent to which a requirement contains all information necessary for implementation and verification.
+Concurrent Users
+The number of users actively using the system at the same time. Required minimum in this project: 150 concurrent users.
+Consistency
+The absence of contradictions or conflicts between different requirements in the specification.
+Customer
+A visitor of the coffee shop who uses the mobile application to browse the menu, place orders, make payments, and reserve tables.
+Data Integrity
+The accuracy and consistency of data stored in the system (e.g., prices must be greater than zero, email addresses must be unique).
+Data Model
+A structured representation of data entities, their attributes, and the relationships between them in the system.
+Data Security
+Protection of system data from unauthorized access, modification, or disclosure using hashing, HTTPS, and access control mechanisms.
+Database
+A structured collection of data stored and managed electronically. In this project: Firebase Realtime Database / Firestore.
+Entity
+A real-world object represented in the system data model (e.g., Customer, Order, Payment, Table, Reservation).
+Exception Flow
+A sequence of actions that occurs when an error or unexpected situation arises during the execution of a use case.
+Firebase
+A cloud-based backend platform by Google used for real-time database storage, authentication, and application hosting.
+Foreign Key (FK)
+A field in a database table that references the Primary Key of another table, establishing a relationship between entities.
+Functional Requirement (FR)
+A specific function or behavior the system must perform. Example: the system shall display the menu when the customer opens the application.
+Interview
+A structured method of gathering requirements by directly questioning stakeholders about their needs, goals, and constraints.
+Kano Model
+A requirements classification method that categorizes features into Must-be, Performance, and Attractive types based on user satisfaction impact.
+KPI (Key Performance Indicator)
+A measurable metric used to evaluate progress toward a business goal (e.g., average bill amount, error rate, report generation time).
+Maintainability
+The ability of the system to be updated, modified, and repaired with minimal effort and downtime.
+MoSCoW Method
+A prioritization technique that classifies requirements into four groups: Must have, Should have, Could have, and Won't have.
+Non-Functional Requirement (NFR)
+A requirement that defines system quality characteristics such as performance, reliability, security, and usability.
+Order
+A set of selected menu items confirmed by a customer, automatically recorded and routed to the cashier and barista by the system.
+Payment
+A financial transaction made by a customer to complete an order, processed via card or QR code through a secure external API (Stripe, Google Pay).
+Performance
+A quality attribute defining system speed and efficiency. In this project: menu loads within 3 seconds, orders processed within 4 seconds.
+Postconditions
+The state of the system after successful or unsuccessful completion of a use case.
+Preconditions
+Conditions that must be satisfied before a use case can begin its execution.
+Primary Key (PK)
+A unique identifier for each record in a database table, ensuring every entity instance can be uniquely identified.
+Prioritization
+The process of ranking requirements by importance to determine implementation order. Methods used: MoSCoW, Kano, RICE, WSJF.
+QR Code
+A machine-readable code linked to a specific café table, used for table identification and payment initiation.
+Quality Attribute
+A measurable characteristic of the system that determines its overall quality: performance, reliability, security, usability, scalability, maintainability.
+Reliability
+The ability of the system to operate continuously without failures. Target: at least 99.5% uptime per month.
+Requirement
+A statement describing a capability, condition, or constraint the system must satisfy to meet stakeholder needs.
+Reservation
+A booking of a specific table for a selected date and time, created by a customer through the mobile application.
+RICE Method
+A quantitative prioritization formula: Score = (Reach x Impact x Confidence) / Effort. Used to rank requirements objectively.
+Scalability
+The ability of the system to handle an increasing number of users and requests without performance degradation.
+Security
+The ability of the system to protect user and payment data from unauthorized access through encryption and secure communication protocols.
+Stakeholder
+An individual or group with an interest in or affected by the system: Owner, Administrator, Customer, Cashier, Barista.
+Technical Specification (TS)
+A formal document defining the goals, requirements, scope, and constraints for software development, agreed upon by both customer and developer.
+TO-BE
+The desired future state of a business process after planned improvements and automation are implemented.
+Traceability
+The ability to link a requirement to its source and to all related artifacts such as design decisions and test cases.
+Trigger
+An event or condition that initiates the execution of a use case. Example: customer opens the application.
+Uptime
+The percentage of time the system is available and operational. Required: at least 99.5% per month.
+Usability
+The degree to which the system is easy and intuitive to use. Target: complete an order in no more than 3 actions within 60 seconds.
+Use Case
+A description of interactions between an actor and the system aimed at achieving a specific goal.
+User Requirement (UR)
+A description of a task that a user needs to perform using the system (e.g., View Menu, Place Order, Process Payment).
+User Story
+A short description of a system function from the user perspective: "As [role], I want [goal], so that [reason]".
+Verifiability
+The property of a requirement that allows its implementation to be confirmed through testing, measurement, or inspection.
+WSJF (Weighted Shortest Job First)
+A prioritization method that scores requirements by (Business Value + Time Criticality + Risk Reduction) / Job Size.
+
+10. Appendices
+Appendix A — AS-IS Model (Current Business Process)
+Current customer service process in the coffee shop "Athena" (before automation):
+
+Step
+Action
+Actor
+Problem
+1
+Customer places an order verbally
+Customer
+No digital record
+2
+Employee manually records order in basic POS
+Cashier
+Risk of input errors
+3
+Total amount is calculated manually
+Cashier
+~8–10 errors/week
+4
+Customer pays cash or card
+Customer / Cashier
+No automated tracking
+5
+Order is passed verbally to barista
+Cashier
+Risk of miscommunication
+6
+At end of shift, admin reconciles sales data manually
+Administrator
+35–40 min per shift
+7
+Reports prepared in Excel
+Administrator
+No real-time analytics
+
+
+Appendix B — TO-BE Model (Automated Business Process)
+Future automated process after implementation of AIS "Athena":
+
+Step
+Action
+Actor
+Improvement
+1
+Customer opens the mobile application
+Customer
+24/7 digital access
+2
+Customer browses digital menu and adds items to cart
+Customer
+No staff required for order taking
+3
+Customer places order — system creates record automatically
+Customer / System
+Zero manual input errors
+4
+System sends order to cashier for payment
+System
+Instant routing
+5
+Cashier processes payment (card or QR)
+Cashier / System
+Automated total calculation
+6
+System sends confirmed order to barista
+System
+No verbal communication needed
+7
+Barista marks order as completed
+Barista
+Real-time order tracking
+8
+System generates shift report automatically
+System
+Report in seconds, not 35–40 min
+lefttop
+Appendix C — Use Case Model
+Main use cases of AIS "Athena":
+
+UC ID
+Use Case
+Actor
+Precondition
+Postcondition
+UC-1
+View Menu and Place Order
+Customer
+Application is open
+Order is created in system
+UC-2
+Process Payment
+Cashier
+Order exists in system
+Order is marked as paid
+UC-3
+Prepare Order
+Barista
+Order is paid
+Order is marked as completed
+UC-4
+Manage Menu
+Administrator
+Admin is logged in
+Menu is updated in database
+UC-5
+Generate Report
+Administrator
+Admin is logged in
+Sales report is generated
+UC-6
+Book Table
+Customer
+Application is open
+Reservation is saved in database
+
+
+
+
+
+Sources of Development
+Laboratory Works 1–7, BSRA course, SE(engl)-1-23
+ISO/IEC/IEEE 29148:2018 — Systems and Software Engineering — Life Cycle Processes — Requirements Engineering
+GOST 34.602-2020 — Technical Specification for Automated System Development
+Wiegers K., Beatty J. — Software Requirements (3rd Edition)
+Firebase Documentation — https://firebase.google.com/docs
+Android Developer Documentation — https://developer.android.com
